@@ -1,7 +1,6 @@
 const {
   userCreate,
   userList,
-  userGetByEmail,
   userGetById,
   userUpdate,
   userDelete
@@ -30,5 +29,6 @@ module.exports = {
   userList: wrap(userList),
   userGetById: wrap(userGetById),
   userUpdate: wrap(userUpdate),
-  userDelete: wrap(userDelete)
+  userDelete: wrap(userDelete),
+  wrap
 }

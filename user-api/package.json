@@ -13,7 +13,6 @@
     "collectCoverageFrom": [
       "src/**/*.{js,jsx}",
       "!**/node_modules/**",
-      "!**/index.js",
       "!**/log.js"
     ],
     "collectCoverage": true,

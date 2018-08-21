@@ -1,6 +1,28 @@
 const AWS = require('aws-sdk')
 const { userCreate, userList, userGetById, userDelete, userUpdate } = require('./user')
 
+const mockItem = { Item: {
+    ssn: {
+      S: '{}'
+    },
+    payload: {
+      S: '{}'
+    },
+    login: {
+      S: '{}'
+    },
+    username: {
+      S: ''
+    },
+    email: {
+      S: ''
+    },
+    id: {
+      S: ''
+    }
+  }
+}
+
 beforeAll(() => {
   process.env.DYNAMODB_TABLE = 'some-table'
   process.env.AWS_DEFAULT_REGION = 'us-east-1'
@@ -24,7 +46,11 @@ describe('userCreate', () => {
     })
     await userCreate({ body: JSON.stringify({
       login: {
-        username: "s"
+        username: "s",
+        uuid: "some-uuid"
+      },
+      id: {
+        some: 'id'
       },
       email: "s"
     }) }, null, null)
@@ -33,7 +59,11 @@ describe('userCreate', () => {
   it('returns 400 if missing email', async () => {
     const p = await userCreate({ body: JSON.stringify({
       login: {
-        username: "s"
+        username: "s",
+        uuid: "some-uuid"
+      },
+      id: {
+        some: 'id'
       }
     }) }, null, null)
     expect(p).toHaveProperty('statusCode')
@@ -45,6 +75,10 @@ describe('userCreate', () => {
   it('returns 400 if missing username', async () => {
     const p = await userCreate({ body: JSON.stringify({
       login: {
+        uuid: 'some-uuid'
+      },
+      id: {
+        some: 'id'
       },
       email: "s"
     }) }, null, null)
@@ -69,7 +103,11 @@ describe('userCreate', () => {
     })
     await expect(userCreate({ body: JSON.stringify({
       login: {
-        username: "s"
+        username: "s",
+        uuid: "some-uuid"
+      },
+      id: {
+        some: 'id'
       },
       email: "s"
     }) }, null, null)).rejects.toThrow(new Error('mock error'))
@@ -90,14 +128,18 @@ describe('userCreate', () => {
     })
     const p = await userCreate({ body: JSON.stringify({
       login: {
-        username: "s"
+        username: "s",
+        uuid: "some-uuid"
+      },
+      id: {
+        some: 'id'
       },
       email: "s"
     }) }, null, null)
     expect(p).toHaveProperty('statusCode')
     expect(p).toHaveProperty('body')
     expect(p.statusCode).toBe(200)
-    expect(p.body).toContain('Item')
+    expect(p.body).toContain('results')
   })
 })
 
@@ -112,7 +154,9 @@ describe('userList', () => {
           expect(params).toHaveProperty('Limit')
           expect(params.Limit).toBe(10)
           return {
-            promise: () => Promise.resolve(true)
+            promise: () => Promise.resolve({
+              Items: []
+            })
           }
         }
       }
@@ -132,7 +176,9 @@ describe('userList', () => {
           expect(params).toHaveProperty('ExclusiveStartKey')
           expect(params.Limit).toBe(200)
           return {
-            promise: () => Promise.resolve(true)
+            promise: () => Promise.resolve({
+              Items: []
+            })
           }
         }
       }
@@ -154,7 +200,9 @@ describe('userList', () => {
           expect(params).toHaveProperty('Limit')
           expect(params.Limit).toBe(10)
           return {
-            promise: () => Promise.resolve(true)
+            promise: () => Promise.resolve({
+              Items: []
+            })
           }
         }
       }
@@ -174,7 +222,9 @@ describe('userList', () => {
         scan: (params) => {
           expect(params).toHaveProperty('TableName')
           return {
-            promise: () => Promise.resolve(true)
+            promise: () => Promise.resolve({
+              Items: []
+            })
           }
         }
       }
@@ -200,9 +250,7 @@ describe('userGetById', () => {
           expect(params).toHaveProperty('Key')
           expect(params.Key).toHaveProperty('id')
           return {
-            promise: () => Promise.resolve({
-              data: 'somedata'
-            })
+            promise: () => Promise.resolve(mockItem)
           }
         }
       }
@@ -256,9 +304,7 @@ describe('userUpdate', () => {
           expect(params).toHaveProperty('ExpressionAttributeValues')
           expect(params).toHaveProperty('ReturnValues')
           return {
-            promise: () => Promise.resolve({
-              some: 'values'
-            })
+            promise: () => Promise.resolve(mockItem)
           }
         }
       }
@@ -267,7 +313,11 @@ describe('userUpdate', () => {
         pathParameters: { id: 'someId' },
         body: JSON.stringify({
         login: {
-          username: "s"
+          username: "s",
+          uuid: "some-uuid"
+        },
+        id: {
+          some: 'id'
         },
         email: "s"
       }) 
@@ -279,8 +329,12 @@ describe('userUpdate', () => {
       pathParameters: { id: 'someId' },
       body: JSON.stringify({
         login: {
-          username: "s"
-        }
+          username: "s",
+          uuid: "some-uuid"
+        },
+        id: {
+          some: 'id'
+        },
       }) 
     }, null, null)
     expect(p).toHaveProperty('statusCode')
@@ -294,6 +348,10 @@ describe('userUpdate', () => {
       pathParameters: { id: 'someId' },
       body: JSON.stringify({
         login: {
+          uuid: 'some-uuid'
+        },
+        id: {
+          some: 'id'
         },
         email: "s"
       }) 
@@ -324,7 +382,11 @@ describe('userUpdate', () => {
       pathParameters: { id: 'someId' },
       body: JSON.stringify({
         login: {
-          username: "s"
+          username: "s",
+          uuid: "some-uuid"
+        },
+        id: {
+          some: 'id'
         },
         email: "s"
       }) 
@@ -342,9 +404,7 @@ describe('userUpdate', () => {
           expect(params).toHaveProperty('ExpressionAttributeValues')
           expect(params).toHaveProperty('ReturnValues')
           return {
-            promise: () => Promise.resolve({
-              some: 'value'
-            })
+            promise: () => Promise.resolve(mockItem)
           }
         }
       }
@@ -353,7 +413,11 @@ describe('userUpdate', () => {
       pathParameters: { id: 'someId' },
       body: JSON.stringify({
       login: {
-        username: "s"
+        username: "s",
+        uuid: "some-uuid"
+      },
+      id: {
+        some: 'id'
       },
       email: "s"
     }) }, null, null)

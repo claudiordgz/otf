@@ -1,0 +1,155 @@
+{
+	"info": {
+		"_postman_id": "efd9d216-7a54-3633-f711-fa5c748d39d9",
+		"name": "otf-user-api",
+		"description": "Endpoints for OTF",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "create-user",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"gender\":\"female\",\"name\":{\"title\":\"miss\",\"first\":\"romane\",\"last\":\"perez\"},\"location\":{\"street\":\"3717 rue dubois\",\"city\":\"bordeaux\",\"state\":\"bouches-du-rhône\",\"postcode\":48220,\"coordinates\":{\"latitude\":\"-47.0755\",\"longitude\":\"-24.7668\"},\"timezone\":{\"offset\":\"+5:00\",\"description\":\"Ekaterinburg, Islamabad, Karachi, Tashkent\"}},\"email\":\"romane.perez@example.com\",\"login\":{\"uuid\":\"446b4f8d-f8ac-44c0-af9c-9533cbdb278d\",\"username\":\"brownelephant232\",\"password\":\"poopie\",\"salt\":\"41RJrORu\",\"md5\":\"23b9a3bb0c9b2608895002c71a66f194\",\"sha1\":\"e896b61cf2466ae1785e2e2e28ef0319ceb26485\",\"sha256\":\"2b2b8100edff6cd58209535e2b94a87c39971f9da46bcafb847b7c89b02360ff\"},\"dob\":{\"date\":\"1994-02-18T11:25:08Z\",\"age\":24},\"registered\":{\"date\":\"2002-04-08T01:23:56Z\",\"age\":16},\"phone\":\"01-62-65-50-67\",\"cell\":\"06-16-18-12-63\",\"id\":{\"name\":\"INSEE\",\"value\":\"2NNaN28512229 62\"},\"picture\":{\"large\":\"https://randomuser.me/api/portraits/women/36.jpg\",\"medium\":\"https://randomuser.me/api/portraits/med/women/36.jpg\",\"thumbnail\":\"https://randomuser.me/api/portraits/thumb/women/36.jpg\"},\"nat\":\"FR\"}"
+				},
+				"url": {
+					"raw": "https://ghbrncxlqc.execute-api.us-east-1.amazonaws.com/dev/user",
+					"protocol": "https",
+					"host": [
+						"ghbrncxlqc",
+						"execute-api",
+						"us-east-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"dev",
+						"user"
+					]
+				},
+				"description": "Creates a User passing a payload"
+			},
+			"response": []
+		},
+		{
+			"name": "list-users",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "https://ghbrncxlqc.execute-api.us-east-1.amazonaws.com/dev/user?results=5&nextToken=9a56f302-d339-455a-b37b-d3fd84dd7534",
+					"protocol": "https",
+					"host": [
+						"ghbrncxlqc",
+						"execute-api",
+						"us-east-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"dev",
+						"user"
+					],
+					"query": [
+						{
+							"key": "results",
+							"value": "5",
+							"description": "Max Results from server (default 10)"
+						},
+						{
+							"key": "nextToken",
+							"value": "9a56f302-d339-455a-b37b-d3fd84dd7534",
+							"description": "Pagination Helper, comes from Server after first call"
+						}
+					]
+				},
+				"description": "List users in Dynamo Table"
+			},
+			"response": []
+		},
+		{
+			"name": "get-by-id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "https://ghbrncxlqc.execute-api.us-east-1.amazonaws.com/dev/user/97890990-7bf2-469d-981c-16a10ae5307f",
+					"protocol": "https",
+					"host": [
+						"ghbrncxlqc",
+						"execute-api",
+						"us-east-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"dev",
+						"user",
+						"97890990-7bf2-469d-981c-16a10ae5307f"
+					]
+				},
+				"description": "Get User's Data By ID"
+			},
+			"response": []
+		},
+		{
+			"name": "update-user",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"gender\":\"female\",\"name\":{\"title\":\"mr\",\"first\":\"kenneth\",\"last\":\"van oostveen\"},\"location\":{\"street\":\"2237 waterlinieweg\",\"city\":\"zwijndrecht\",\"state\":\"overijssel\",\"postcode\":81170,\"coordinates\":{\"latitude\":\"69.3921\",\"longitude\":\"121.3114\"},\"timezone\":{\"offset\":\"+1:00\",\"description\":\"Brussels, Copenhagen, Madrid, Paris\"}},\"email\":\"kenneth.vanoostveen@example.com\",\"login\":{\"uuid\":\"83aed4e4-38d7-473e-9c24-b3e1754cb6e4\",\"username\":\"heavyleopard888\",\"password\":\"theman\",\"salt\":\"l3ECt2yX\",\"md5\":\"23c1182dc4095a70ea5eca5f2e8e8c5b\",\"sha1\":\"8a62fdbabfcacadb3c17849f5a60ab28bcb683bc\",\"sha256\":\"97425720cc2050f2727279b8262e8b1411a33d2f5dd971b1d90c1f34ca17d5e3\"},\"dob\":{\"date\":\"1956-07-21T19:06:38Z\",\"age\":62},\"registered\":{\"date\":\"2007-12-13T14:06:54Z\",\"age\":10},\"phone\":\"(626)-864-8981\",\"cell\":\"(563)-249-5004\",\"id\":{\"name\":\"BSN\",\"value\":\"64991785\"},\"picture\":{\"large\":\"https://randomuser.me/api/portraits/men/36.jpg\",\"medium\":\"https://randomuser.me/api/portraits/med/men/36.jpg\",\"thumbnail\":\"https://randomuser.me/api/portraits/thumb/men/36.jpg\"},\"nat\":\"NL\"}"
+				},
+				"url": {
+					"raw": "https://ghbrncxlqc.execute-api.us-east-1.amazonaws.com/dev/user/97890990-7bf2-469d-981c-16a10ae5307f",
+					"protocol": "https",
+					"host": [
+						"ghbrncxlqc",
+						"execute-api",
+						"us-east-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"dev",
+						"user",
+						"97890990-7bf2-469d-981c-16a10ae5307f"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete-user",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "https://ghbrncxlqc.execute-api.us-east-1.amazonaws.com/dev/user/2caeee7a-8056-40fb-a3ea-a08a3d96128a",
+					"protocol": "https",
+					"host": [
+						"ghbrncxlqc",
+						"execute-api",
+						"us-east-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"dev",
+						"user",
+						"2caeee7a-8056-40fb-a3ea-a08a3d96128a"
+					]
+				},
+				"description": "Deletes user by ID"
+			},
+			"response": []
+		}
+	]
+}

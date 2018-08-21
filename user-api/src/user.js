@@ -2,9 +2,10 @@ const uuid = require('uuid/v1')
 const AWS = require('aws-sdk')
 const { log } = require('./log')
 const { has, omit } = require('lodash')
+const { dynamoObjToModel } = require('./dynamoObjToModel')
 
-function sanitize (data) {
-  return Array.from([ 'email', 'login', 'login.username' ])
+function sanityCheck (data) {
+  return Array.from([ 'email', 'login.uuid', 'login.username', 'id' ])
     .map(x => {
       if (!has(data, x)) {
         log({ msg: `validation failed, missing ${x}` })
@@ -21,6 +22,10 @@ function sanitize (data) {
     .filter(x => x)
 }
 
+function sanitizePayload (payload) {
+  return omit(payload, ['login', 'email', 'id'])
+}
+
 const userCreate = async (event) => {
   log({
     event,
@@ -28,7 +33,7 @@ const userCreate = async (event) => {
   })
   const data = JSON.parse(event.body)
   log({ data, msg: 'parsed event body' })
-  const errors = sanitize(data)
+  const errors = sanityCheck(data)
   if (errors.length > 0) {
     return errors[0]
   }
@@ -37,7 +42,7 @@ const userCreate = async (event) => {
     TableName: process.env.DYNAMODB_TABLE,
     Item: {
       id: {
-        S: uuid()
+        S: data.login.uuid
       },
       email: {
         S: data.email
@@ -48,8 +53,11 @@ const userCreate = async (event) => {
       login: {
         S: JSON.stringify(data.login)
       },
+      ssn: {
+        S: JSON.stringify(data.id)
+      },
       payload: {
-        S: JSON.stringify(omit(data, ['login', 'email']))
+        S: JSON.stringify(sanitizePayload(data))
       },
       createdAt: {
         S: timestamp
@@ -69,7 +77,7 @@ const userCreate = async (event) => {
   return {
     statusCode: 200,
     body: JSON.stringify({
-      Item: params.Item
+      results: dynamoObjToModel(params.Item)
     })
   }
 }
@@ -88,7 +96,9 @@ const userList = async (event) => {
     if (nextToken !== undefined) {
       params = Object.assign({
         ExclusiveStartKey: {
-          S: nextToken 
+          id: {
+            S: nextToken 
+          }
         }
       }, params)
     } 
@@ -99,10 +109,11 @@ const userList = async (event) => {
   const dynamoDb = new AWS.DynamoDB()
   const data = await dynamoDb.scan(params).promise()
   log({ msg: 'got data from scan', data })
+  const payload = omit(data, ['LastEvaluatedKey']).Items.map(dynamoObjToModel)
   return {
     statusCode: 200,
     body: JSON.stringify({
-      items: JSON.stringify(omit(data, ['LastEvaluatedKey'])),
+      results: payload,
       nextToken: data.LastEvaluatedKey
     })
   }
@@ -116,7 +127,9 @@ const userGetById = async (event) => {
   const params = {
     TableName: process.env.DYNAMODB_TABLE,
     Key: {
-      id: event.pathParameters.id,
+      id: {
+        S: event.pathParameters.id
+      }
     }
   }
   log({ 
@@ -129,7 +142,7 @@ const userGetById = async (event) => {
   return {
     statusCode: 200,
     body: JSON.stringify({
-      item
+      results: dynamoObjToModel(item.Item)
     })
   }
 }
@@ -141,7 +154,7 @@ const userUpdate = async (event) => {
   })
   const data = JSON.parse(event.body)
   log({ data, msg: 'parsed event body' })
-  const errors = sanitize(data)
+  const errors = sanityCheck(data)
   if (errors.length > 0) {
     return errors[0]
   }
@@ -149,16 +162,31 @@ const userUpdate = async (event) => {
   const params = {
     TableName: process.env.DYNAMODB_TABLE,
     Key: {
-      id: event.pathParameters.id
+      id: {
+        S: event.pathParameters.id
+      }
     },
     ExpressionAttributeValues: {
-      ":email": data.email,
-      ":username": data.login.username,
-      ":login": JSON.stringify(data.login),
-      ":payload": JSON.stringify(omit(data, ['login', 'email'])),
-      ":updatedAt": timestamp
+      ":email": {
+        S: data.email
+      },
+      ":username": {
+        S: data.login.username
+      },
+      ":login": {
+        S: JSON.stringify(data.login)
+      },
+      ":ssn": {
+        S: JSON.stringify(data.id)
+      },
+      ":payload": {
+        S: JSON.stringify(sanitizePayload(data))
+      },
+      ":updatedAt": {
+        S: timestamp
+      }
     },
-    UpdateExpression: "set email = :email, username=:username, login=:login, payload=:payload, updatedAt=:updatedAt",
+    UpdateExpression: "set email = :email, username=:username, login=:login, payload=:payload, updatedAt=:updatedAt, ssn=:ssn",
     ReturnValues: 'ALL_NEW'
   }
   log({ 
@@ -171,7 +199,7 @@ const userUpdate = async (event) => {
   return {
     statusCode: 200,
     body: JSON.stringify({
-      item
+      results: dynamoObjToModel(item.Attributes)
     })
   }
 }
@@ -184,7 +212,9 @@ const userDelete = async (event) => {
   const params = {
     TableName: process.env.DYNAMODB_TABLE,
     Key: {
-      id: event.pathParameters.id,
+      id: {
+        S: event.pathParameters.id
+      }
     }
   }
   log({ 
@@ -197,7 +227,7 @@ const userDelete = async (event) => {
   return {
     statusCode: 200,
     body: JSON.stringify({
-      item
+      id: event.pathParameters.id
     })
   }
 }
