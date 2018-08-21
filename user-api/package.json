@@ -6,20 +6,25 @@
   "license": "MIT",
   "scripts": {
     "build": "webpack",
-    "test": "jest"
+    "test": "jest",
+    "deploy": "npm run build && sls deploy"
   },
   "jest": {
     "collectCoverageFrom": [
-      "**/*.{js,jsx}",
+      "src/**/*.{js,jsx}",
       "!**/node_modules/**",
       "!**/index.js",
       "!**/log.js"
-    ]
+    ],
+    "collectCoverage": true,
+    "coverageReporters": ["json", "html"],
+    "coverageDirectory": "./coverage"
   },
   "dependencies": {},
   "devDependencies": {
     "aws-sdk": "^2.297.0",
     "jest": "^23.5.0",
+    "lodash": "^4.17.10",
     "uuid": "^3.3.2",
     "webpack": "^4.16.5",
     "webpack-cli": "^3.1.0"

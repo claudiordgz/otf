@@ -1,0 +1,20 @@
+{
+  "name": "user-api-migrations",
+  "version": "0.0.1",
+  "description": "Copies data from randomuser.me to DynamoDB using user-api",
+  "author": "claudiordgz <claudio.rdgz@gmail.com",
+  "license": "MIT",
+  "scripts": {
+    "test": "jest"
+  },
+  "jest": {
+    "collectCoverageFrom": [
+      "src/**/*.{js,jsx}",
+      "!**/node_modules/**"
+    ]
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "jest": "^23.5.0"
+  }
+}

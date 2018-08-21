@@ -84,3 +84,4 @@ typings/
 
 deploy
 package-lock.json
+coverage
