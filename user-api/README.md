@@ -2,6 +2,15 @@
 
 This example shows how to setup a RESTful Web Service that allows to Create, List, Get, Update, Delete Users. It has been built with the payload from randomuser.me in mind and another script copies data from the API into DynamoDB. 
 
+Current endpoints are:
+```
+POST - https://ghbrncxlqc.execute-api.us-east-1.amazonaws.com/dev/user
+GET - https://ghbrncxlqc.execute-api.us-east-1.amazonaws.com/dev/user
+GET - https://ghbrncxlqc.execute-api.us-east-1.amazonaws.com/dev/user/{id}
+PUT - https://ghbrncxlqc.execute-api.us-east-1.amazonaws.com/dev/user/{id}
+DELETE - https://ghbrncxlqc.execute-api.us-east-1.amazonaws.com/dev/user/{id}
+```
+
 ## Setup
 
 This repo assumes you have an AWS Profile and Serverless Framework installed and configured. Afterwards it is necessary to install the dependencies.
