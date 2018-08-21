@@ -39,13 +39,6 @@ functions:
           path: user
           method: get
           cors: true
-  getByEmail:
-    handler: deploy/handler.userGetByEmail
-    events:
-      - http:
-          path: userByEmail/{email}
-          method: get
-          cors: true
   getById:
     handler: deploy/handler.userGetById
     events:

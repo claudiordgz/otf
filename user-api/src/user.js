@@ -21,7 +21,7 @@ function sanitize (data) {
     .filter(x => x)
 }
 
-const userCreate = async (event, _, __) => {
+const userCreate = async (event) => {
   log({
     event,
     msg: 'userCreate execution'
@@ -74,74 +74,130 @@ const userCreate = async (event, _, __) => {
   }
 }
 
-const userList = async (event, context, callback) => {
+const userList = async (event) => {
   log({
     event,
     msg: 'userList execution'
   })
-  const params = {
+  let params = {
     TableName: process.env.DYNAMODB_TABLE
   }
-  log({ msg: 'calling scan' })
+  if (event.queryStringParameters !== null) {
+    const { nextToken, results } = event.queryStringParameters
+    params = Object.assign({ Limit: results || 10 }, params)
+    if (nextToken !== undefined) {
+      params = Object.assign({
+        ExclusiveStartKey: {
+          S: nextToken 
+        }
+      }, params)
+    } 
+  } else {
+    params = Object.assign({ Limit: 10 }, params)
+  }
+  log({ params, msg: 'calling scan' })
   const dynamoDb = new AWS.DynamoDB()
   const data = await dynamoDb.scan(params).promise()
+  log({ msg: 'got data from scan', data })
   return {
     statusCode: 200,
     body: JSON.stringify({
-      data
+      items: JSON.stringify(omit(data, ['LastEvaluatedKey'])),
+      nextToken: data.LastEvaluatedKey
     })
   }
 }
 
-const userGetByEmail = async (event, context, callback) => {
-  log({
-    event,
-    msg: 'userGetByEmail execution'
-  })
-  return {
-    statusCode: 200,
-    body: JSON.stringify({
-      nothing: 'nada'
-    })
-  }
-}
-
-
-const userGetById = async (event, context, callback) => {
+const userGetById = async (event) => {
   log({
     event,
     msg: 'userGetById execution'
   })
+  const params = {
+    TableName: process.env.DYNAMODB_TABLE,
+    Key: {
+      id: event.pathParameters.id,
+    }
+  }
+  log({ 
+    params,
+    msg: 'calling getItem' 
+  })
+  const dynamoDb = new AWS.DynamoDB()
+  const item = await dynamoDb.getItem(params).promise()
+  log({ msg: 'got data from getItem', item })
   return {
     statusCode: 200,
     body: JSON.stringify({
-      nothing: 'nada'
+      item
     })
   }
 }
 
-const userUpdate = async (event, context, callback) => {
+const userUpdate = async (event) => {
   log({
     event,
     msg: 'userUpdate execution'
   })
+  const data = JSON.parse(event.body)
+  log({ data, msg: 'parsed event body' })
+  const errors = sanitize(data)
+  if (errors.length > 0) {
+    return errors[0]
+  }
+  const timestamp = new Date().toISOString()
+  const params = {
+    TableName: process.env.DYNAMODB_TABLE,
+    Key: {
+      id: event.pathParameters.id
+    },
+    ExpressionAttributeValues: {
+      ":email": data.email,
+      ":username": data.login.username,
+      ":login": JSON.stringify(data.login),
+      ":payload": JSON.stringify(omit(data, ['login', 'email'])),
+      ":updatedAt": timestamp
+    },
+    UpdateExpression: "set email = :email, username=:username, login=:login, payload=:payload, updatedAt=:updatedAt",
+    ReturnValues: 'ALL_NEW'
+  }
+  log({ 
+    params,
+    msg: 'calling updateItem' 
+  })
+  const dynamoDb = new AWS.DynamoDB()
+  const item = await dynamoDb.updateItem(params).promise()
+  log({ msg: 'got data from updateItem', item })
   return {
     statusCode: 200,
     body: JSON.stringify({
-      nothing: 'nada'
+      item
     })
   }
 }
 
-const userDelete = async (event, context, callback) => {
+const userDelete = async (event) => {
   log({
     event,
     msg: 'userDelete execution'
   })
+  const params = {
+    TableName: process.env.DYNAMODB_TABLE,
+    Key: {
+      id: event.pathParameters.id,
+    }
+  }
+  log({ 
+    params,
+    msg: 'calling deleteItem' 
+  })
+  const dynamoDb = new AWS.DynamoDB()
+  const item = await dynamoDb.deleteItem(params).promise()
+  log({ msg: 'got data from deleteItem', item })
   return {
     statusCode: 200,
     body: JSON.stringify({
-      nothing: 'nada'
+      item
     })
   }
 }
@@ -150,7 +206,6 @@ const userDelete = async (event, context, callback) => {
 module.exports = {
   userCreate,
   userList,
-  userGetByEmail,
   userGetById,
   userUpdate,
   userDelete

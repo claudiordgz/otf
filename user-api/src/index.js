@@ -1,9 +1,9 @@
 const {
-  create,
-  list,
-  getByEmail,
-  getById,
-  update,
+  userCreate,
+  userList,
+  userGetByEmail,
+  userGetById,
+  userUpdate,
   userDelete
 } = require('./user')
 const { log } = require('./log')
@@ -26,10 +26,9 @@ const wrap = (fn) => (event, context, callback) =>
     })
 
 module.exports = {
-  userCreate: wrap(create),
-  userList: wrap(list),
-  userGetByEmail: wrap(getByEmail),
-  userGetById: wrap(getById),
-  userUpdate: wrap(update),
+  userCreate: wrap(userCreate),
+  userList: wrap(userList),
+  userGetById: wrap(userGetById),
+  userUpdate: wrap(userUpdate),
   userDelete: wrap(userDelete)
 }
