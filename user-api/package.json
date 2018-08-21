@@ -1,0 +1,27 @@
+{
+  "name": "user-api-serverless",
+  "version": "0.0.1",
+  "description": "Serverless CRUD service mirroring randomuser.me payload",
+  "author": "claudiordgz <claudio.rdgz@gmail.com",
+  "license": "MIT",
+  "scripts": {
+    "build": "webpack",
+    "test": "jest"
+  },
+  "jest": {
+    "collectCoverageFrom": [
+      "**/*.{js,jsx}",
+      "!**/node_modules/**",
+      "!**/index.js",
+      "!**/log.js"
+    ]
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "aws-sdk": "^2.297.0",
+    "jest": "^23.5.0",
+    "uuid": "^3.3.2",
+    "webpack": "^4.16.5",
+    "webpack-cli": "^3.1.0"
+  }
+}
