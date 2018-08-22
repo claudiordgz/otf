@@ -1,6 +1,6 @@
 # Build a Restful API using AWS API Gateway, DynamoDB and Serverless
 
-Here lies the code to create the final product.
+Here lies the code to create an API similar to the one in randomuser.me
 
 ### [`user-api`](./user-api)
 
